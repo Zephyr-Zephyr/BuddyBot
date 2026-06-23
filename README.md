@@ -377,5 +377,4 @@ pm2 startup
 ---
 
 ## License
-
-MIT — free to use, modify, and distribute.
+ free to use, modify, and distribute.
