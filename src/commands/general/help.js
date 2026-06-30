@@ -30,7 +30,11 @@ export default {
             '`/minigame rps` – Schere, Stein, Papier\n`/minigame tictactoe` – Tic-Tac-Toe vs Bot\n`/minigame zahlen` – Zahl raten (1–100)\n`/minigame trivia` + `/minigame antworten` – Quiz',
         },
         {
-          name: '👋 Welcome',
+          name: '� Status',
+          value: '`/status` – Prüft den aktuellen Status der Pulse-Webseite und zeigt den Entwicklungsstatus an',
+        },
+        {
+          name: '�👋 Welcome',
           value: 'Automatische Begrüßung bei neuen Mitgliedern (Kanal in `.env` konfigurieren)',
         }
       )
