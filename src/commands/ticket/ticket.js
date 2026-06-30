@@ -11,13 +11,13 @@ import { TICKET_CREATE } from '../../utils/constants.js';
 export default {
   data: new SlashCommandBuilder()
     .setName('ticket')
-    .setDescription('Ticket-System')
+    .setDescription('Ticket system')
     .addSubcommand((sub) =>
       sub
         .setName('panel')
-        .setDescription('Erstellt das Ticket-Panel mit Button')
+        .setDescription('Create the ticket panel with a button')
         .addChannelOption((opt) =>
-          opt.setName('kanal').setDescription('Kanal für das Panel (Standard: aktueller Kanal)').setRequired(false)
+          opt.setName('channel').setDescription('Channel for the panel (default: current channel)').setRequired(false)
         )
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
@@ -26,26 +26,26 @@ export default {
     const sub = interaction.options.getSubcommand();
 
     if (sub === 'panel') {
-      const channel = interaction.options.getChannel('kanal') || interaction.channel;
+      const channel = interaction.options.getChannel('channel') || interaction.channel;
 
       const embed = new EmbedBuilder()
         .setColor(0x5865f2)
-        .setTitle('🎫 Support-Tickets')
+        .setTitle('🎫 Support Tickets')
         .setDescription(
-          'Brauchst du Hilfe? Klicke auf den Button unten, um ein privates Ticket zu eröffnen.\n\nUnser Team meldet sich so schnell wie möglich.'
+          'Need help? Click the button below to open a private ticket.\n\nOur team will respond as soon as possible.'
         )
-        .setFooter({ text: 'Ein Ticket pro Person' });
+        .setFooter({ text: 'One ticket per person' });
 
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
           .setCustomId(TICKET_CREATE)
-          .setLabel('Ticket erstellen')
+          .setLabel('Create Ticket')
           .setStyle(ButtonStyle.Primary)
           .setEmoji('🎫')
       );
 
       await channel.send({ embeds: [embed], components: [row] });
-      await interaction.reply({ content: `✅ Ticket-Panel in ${channel} erstellt.`, ephemeral: true });
+      await interaction.reply({ content: `✅ Ticket panel created in ${channel}.`, ephemeral: true });
     }
   },
 };

@@ -38,12 +38,12 @@ export async function handleButton(interaction) {
     const giveaway = db.prepare('SELECT * FROM giveaways WHERE id = ? AND ended = 0').get(giveawayId);
 
     if (!giveaway) {
-      await interaction.reply({ content: '❌ Dieses Giveaway existiert nicht mehr.', ephemeral: true });
+      await interaction.reply({ content: '❌ This giveaway no longer exists.', ephemeral: true });
       return;
     }
 
     if (Date.now() >= giveaway.ends_at) {
-      await interaction.reply({ content: '⏰ Dieses Giveaway ist bereits beendet.', ephemeral: true });
+      await interaction.reply({ content: '⏰ This giveaway has already ended.', ephemeral: true });
       return;
     }
 
@@ -52,9 +52,9 @@ export async function handleButton(interaction) {
         giveawayId,
         interaction.user.id
       );
-      await interaction.reply({ content: '🎉 Du nimmst am Giveaway teil!', ephemeral: true });
+      await interaction.reply({ content: '🎉 You are now participating in the giveaway!', ephemeral: true });
     } catch {
-      await interaction.reply({ content: 'ℹ️ Du nimmst bereits teil!', ephemeral: true });
+      await interaction.reply({ content: 'ℹ️ You are already participating!', ephemeral: true });
     }
     return;
   }
@@ -64,7 +64,7 @@ export async function handleButton(interaction) {
     const poll = db.prepare('SELECT * FROM polls WHERE id = ? AND closed = 0').get(pollId);
 
     if (!poll) {
-      await interaction.reply({ content: '❌ Diese Umfrage ist nicht mehr aktiv.', ephemeral: true });
+      await interaction.reply({ content: '❌ This poll is no longer active.', ephemeral: true });
       return;
     }
 
@@ -73,7 +73,7 @@ export async function handleButton(interaction) {
       'INSERT INTO poll_votes (poll_id, user_id, option_index) VALUES (?, ?, ?) ON CONFLICT(poll_id, user_id) DO UPDATE SET option_index = excluded.option_index'
     ).run(pollId, interaction.user.id, optionIndex);
 
-    await interaction.reply({ content: '✅ Deine Stimme wurde gespeichert!', ephemeral: true });
+    await interaction.reply({ content: '✅ Your vote has been saved!', ephemeral: true });
 
     const options = JSON.parse(poll.options);
     const votes = db.prepare('SELECT option_index, COUNT(*) as count FROM poll_votes WHERE poll_id = ? GROUP BY option_index').all(pollId);
@@ -88,7 +88,7 @@ export async function handleButton(interaction) {
     });
 
     const embed = EmbedBuilder.from(interaction.message.embeds[0]).setDescription(
-      `**${poll.question}**\n\n${lines.join('\n\n')}\n\n_Gesamt: ${total} Stimme(n)_`
+      `**${poll.question}**\n\n${lines.join('\n\n')}\n\n_Total: ${total} vote(s)_`
     );
 
     await interaction.message.edit({ embeds: [embed] }).catch(() => {});

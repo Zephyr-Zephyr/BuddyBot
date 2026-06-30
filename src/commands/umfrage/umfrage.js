@@ -12,13 +12,13 @@ import { POLL_PREFIX } from '../../utils/constants.js';
 
 export default {
   data: new SlashCommandBuilder()
-    .setName('umfrage')
-    .setDescription('Umfragen erstellen und verwalten')
+    .setName('poll')
+    .setDescription('Create and manage polls')
     .addSubcommand((sub) =>
       sub
-        .setName('erstellen')
-        .setDescription('Erstellt eine neue Umfrage')
-        .addStringOption((opt) => opt.setName('frage').setDescription('Die Frage').setRequired(true))
+        .setName('create')
+        .setDescription('Create a new poll')
+        .addStringOption((opt) => opt.setName('question').setDescription('The question').setRequired(true))
         .addStringOption((opt) => opt.setName('option1').setDescription('Option 1').setRequired(true))
         .addStringOption((opt) => opt.setName('option2').setDescription('Option 2').setRequired(true))
         .addStringOption((opt) => opt.setName('option3').setDescription('Option 3').setRequired(false))
@@ -27,10 +27,10 @@ export default {
     )
     .addSubcommand((sub) =>
       sub
-        .setName('beenden')
-        .setDescription('Beendet eine Umfrage')
+        .setName('close')
+        .setDescription('Close a poll')
         .addStringOption((opt) =>
-          opt.setName('nachricht_id').setDescription('Message-ID der Umfrage').setRequired(true)
+          opt.setName('message_id').setDescription('Message ID of the poll').setRequired(true)
         )
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
@@ -38,14 +38,14 @@ export default {
   async execute(interaction) {
     const sub = interaction.options.getSubcommand();
 
-    if (sub === 'erstellen') {
-      const question = interaction.options.getString('frage');
+    if (sub === 'create') {
+      const question = interaction.options.getString('question');
       const options = [1, 2, 3, 4, 5]
         .map((n) => interaction.options.getString(`option${n}`))
         .filter(Boolean);
 
       if (options.length < 2) {
-        await interaction.reply({ content: '❌ Mindestens 2 Optionen erforderlich.', ephemeral: true });
+        await interaction.reply({ content: '❌ At least 2 options required.', ephemeral: true });
         return;
       }
 
@@ -54,9 +54,9 @@ export default {
 
       const embed = new EmbedBuilder()
         .setColor(0x5865f2)
-        .setTitle('📊 Umfrage')
-        .setDescription(`**${question}**\n\n${lines.join('\n\n')}\n\n_Gesamt: 0 Stimme(n)_`)
-        .setFooter({ text: `Erstellt von ${interaction.user.username}` })
+        .setTitle('📊 Poll')
+        .setDescription(`**${question}**\n\n${lines.join('\n\n')}\n\n_Total: 0 vote(s)_`)
+        .setFooter({ text: `Created by ${interaction.user.username}` })
         .setTimestamp();
 
       const rows = [];
@@ -82,18 +82,18 @@ export default {
         'INSERT INTO polls (id, channel_id, message_id, question, options, creator_id) VALUES (?, ?, ?, ?, ?, ?)'
       ).run(id, interaction.channel.id, message.id, question, JSON.stringify(options), interaction.user.id);
 
-      await interaction.reply({ content: '✅ Umfrage erstellt!', ephemeral: true });
+      await interaction.reply({ content: '✅ Poll created!', ephemeral: true });
       return;
     }
 
-    if (sub === 'beenden') {
-      const messageId = interaction.options.getString('nachricht_id');
+    if (sub === 'close') {
+      const messageId = interaction.options.getString('message_id');
       const poll = db
         .prepare('SELECT * FROM polls WHERE message_id = ? AND channel_id = ? AND closed = 0')
         .get(messageId, interaction.channel.id);
 
       if (!poll) {
-        await interaction.reply({ content: '❌ Keine aktive Umfrage gefunden.', ephemeral: true });
+        await interaction.reply({ content: '❌ No active poll found.', ephemeral: true });
         return;
       }
 
@@ -104,7 +104,7 @@ export default {
         await message.edit({ components: [] }).catch(() => {});
       }
 
-      await interaction.reply({ content: '✅ Umfrage beendet. Abstimmung ist geschlossen.', ephemeral: true });
+      await interaction.reply({ content: '✅ Poll closed. Voting is no longer possible.', ephemeral: true });
     }
   },
 };

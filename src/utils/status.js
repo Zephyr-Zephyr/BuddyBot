@@ -2,7 +2,7 @@ export async function getWebsiteStatus(url, options = {}) {
   const {
     timeoutMs = 4000,
     fallbackLabel = '🟡 Pulse In Development',
-    fallbackDetail = 'Pulse befindet sich aktuell in Entwicklung.',
+    fallbackDetail = 'Pulse is currently in development.',
   } = options;
 
   if (!url) {
@@ -24,7 +24,7 @@ export async function getWebsiteStatus(url, options = {}) {
       return {
         isOnline: true,
         label: '🟢 Online',
-        detail: `Die Website antwortet erfolgreich mit Status ${response.status}.`,
+        detail: `Website is responding successfully with status ${response.status}.`,
         checkedUrl: url,
       };
     }
@@ -32,7 +32,7 @@ export async function getWebsiteStatus(url, options = {}) {
     return {
       isOnline: false,
       label: '🟡 Pulse In Development',
-      detail: `Die Website antwortet mit Status ${response.status}.`,
+      detail: `Website is responding with status ${response.status}.`,
       checkedUrl: url,
     };
   } catch {

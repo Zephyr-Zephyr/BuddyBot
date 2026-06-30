@@ -31,18 +31,18 @@ export async function endGiveaway(client, giveawayId, reroll = false) {
 
   const embed = EmbedBuilder.from(message.embeds[0])
     .setColor(winners.length ? 0x57f287 : 0xed4245)
-    .setTitle('🎉 Giveaway beendet!')
+    .setTitle('🎉 Giveaway Ended!')
     .setDescription(
       winners.length
-        ? `**Preis:** ${giveaway.prize}\n\n**Gewinner:** ${winners.map((id) => `<@${id}>`).join(', ')}\n\n_Gehostet von <@${giveaway.host_id}>_`
-        : `**Preis:** ${giveaway.prize}\n\n❌ Keine gültigen Teilnehmer.\n\n_Gehostet von <@${giveaway.host_id}>_`
+        ? `**Prize:** ${giveaway.prize}\n\n**Winners:** ${winners.map((id) => `<@${id}>`).join(', ')}\n\n_Hosted by <@${giveaway.host_id}>_`
+        : `**Prize:** ${giveaway.prize}\n\n❌ No valid participants.\n\n_Hosted by <@${giveaway.host_id}>_`
     );
 
   await message.edit({ embeds: [embed], components: [] });
 
   if (winners.length) {
     await channel.send({
-      content: `🎊 Glückwunsch ${winners.map((id) => `<@${id}>`).join(', ')}! Ihr habt **${giveaway.prize}** gewonnen!`,
+      content: `🎊 Congratulations ${winners.map((id) => `<@${id}>`).join(', ')}! You won **${giveaway.prize}**!`,
     });
   }
 
@@ -52,11 +52,11 @@ export async function endGiveaway(client, giveawayId, reroll = false) {
 export function buildGiveawayEmbed({ prize, endsAt, hostId, winnerCount, ended = false, winners = [] }) {
   const embed = new EmbedBuilder()
     .setColor(ended ? 0x57f287 : 0x5865f2)
-    .setTitle(ended ? '🎉 Giveaway beendet!' : '🎁 Giveaway')
+    .setTitle(ended ? '🎉 Giveaway Ended!' : '🎁 Giveaway')
     .setDescription(
       ended
-        ? `**Preis:** ${prize}\n\n**Gewinner:** ${winners.length ? winners.map((id) => `<@${id}>`).join(', ') : 'Keine'}\n\n_Gehostet von <@${hostId}>_`
-        : `**Preis:** ${prize}\n\n**Gewinner:** ${winnerCount}\n**Endet:** <t:${Math.floor(endsAt / 1000)}:R> (<t:${Math.floor(endsAt / 1000)}:F>)\n\nKlicke 🎉 um teilzunehmen!\n\n_Gehostet von <@${hostId}>_`
+        ? `**Prize:** ${prize}\n\n**Winners:** ${winners.length ? winners.map((id) => `<@${id}>`).join(', ') : 'None'}\n\n_Hosted by <@${hostId}>_`
+        : `**Prize:** ${prize}\n\n**Winners:** ${winnerCount}\n**Ends:** <t:${Math.floor(endsAt / 1000)}:R> (<t:${Math.floor(endsAt / 1000)}:F>)\n\nClick 🎉 to participate!\n\n_Hosted by <@${hostId}>_`
     )
     .setTimestamp(ended ? undefined : new Date(endsAt));
 

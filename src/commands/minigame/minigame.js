@@ -10,16 +10,16 @@ import {
 export default {
   data: new SlashCommandBuilder()
     .setName('minigame')
-    .setDescription('Minigames spielen')
-    .addSubcommand((sub) => sub.setName('rps').setDescription('Schere, Stein, Papier gegen den Bot'))
-    .addSubcommand((sub) => sub.setName('tictactoe').setDescription('Tic-Tac-Toe gegen den Bot'))
-    .addSubcommand((sub) => sub.setName('zahlen').setDescription('Rate eine Zahl zwischen 1 und 100'))
-    .addSubcommand((sub) => sub.setName('trivia').setDescription('Starte eine Quiz-Frage'))
+    .setDescription('Play minigames')
+    .addSubcommand((sub) => sub.setName('rps').setDescription('Rock, Paper, Scissors against the bot'))
+    .addSubcommand((sub) => sub.setName('tictactoe').setDescription('Tic-Tac-Toe against the bot'))
+    .addSubcommand((sub) => sub.setName('guess').setDescription('Guess a number between 1 and 100'))
+    .addSubcommand((sub) => sub.setName('trivia').setDescription('Start a trivia question'))
     .addSubcommand((sub) =>
       sub
-        .setName('antworten')
-        .setDescription('Antwort auf eine aktive Trivia-Frage')
-        .addStringOption((opt) => opt.setName('text').setDescription('Deine Antwort').setRequired(true))
+        .setName('answer')
+        .setDescription('Answer an active trivia question')
+        .addStringOption((opt) => opt.setName('text').setDescription('Your answer').setRequired(true))
     ),
 
   async execute(interaction) {
@@ -32,13 +32,13 @@ export default {
       case 'tictactoe':
         await startTtt(interaction);
         break;
-      case 'zahlen':
+      case 'guess':
         await startGuess(interaction);
         break;
       case 'trivia':
         await startTrivia(interaction);
         break;
-      case 'antworten':
+      case 'answer':
         await answerTrivia(interaction, interaction.options.getString('text'));
         break;
     }

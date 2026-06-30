@@ -6,13 +6,13 @@ import {
 } from 'discord.js';
 import { RPS_PREFIX, TTT_PREFIX } from './constants.js';
 
-const CHOICES = ['stein', 'papier', 'schere'];
-const CHOICE_EMOJI = { stein: '🪨', papier: '📄', schere: '✂️' };
+const CHOICES = ['rock', 'paper', 'scissors'];
+const CHOICE_EMOJI = { rock: '🪪', paper: '📄', scissors: '✌️' };
 
 const WIN_MAP = {
-  stein: 'schere',
-  papier: 'stein',
-  schere: 'papier',
+  rock: 'scissors',
+  paper: 'rock',
+  scissors: 'paper',
 };
 
 export async function startRps(interaction) {
@@ -28,8 +28,8 @@ export async function startRps(interaction) {
 
   const embed = new EmbedBuilder()
     .setColor(0x5865f2)
-    .setTitle('✂️ Schere, Stein, Papier')
-    .setDescription('Wähle deine Hand!');
+    .setTitle('✌️ Rock, Paper, Scissors')
+    .setDescription('Choose your hand!');
 
   await interaction.reply({ embeds: [embed], components: [row] });
 }
@@ -41,15 +41,15 @@ export async function handleRpsChoice(interaction, playerChoice) {
   let result;
 
   if (playerChoice === botChoice) {
-    result = '🤝 Unentschieden!';
+    result = '🤚 Draw!';
   } else if (WIN_MAP[playerChoice] === botChoice) {
-    result = '🎉 Du gewinnst!';
+    result = '🎉 You win!';
   } else {
-    result = '😢 Du verlierst!';
+    result = '😢 You lose!';
   }
 
   const embed = EmbedBuilder.from(interaction.message.embeds[0]).setDescription(
-    `Du: ${CHOICE_EMOJI[playerChoice]} **${playerChoice}**\nBot: ${CHOICE_EMOJI[botChoice]} **${botChoice}**\n\n${result}`
+    `You: ${CHOICE_EMOJI[playerChoice]} **${playerChoice}**\nBot: ${CHOICE_EMOJI[botChoice]} **${botChoice}**\n\n${result}`
   );
 
   await interaction.update({ embeds: [embed], components: [] });
@@ -117,7 +117,7 @@ export async function startTtt(interaction) {
   const embed = new EmbedBuilder()
     .setColor(0x5865f2)
     .setTitle('⭕ Tic-Tac-Toe')
-    .setDescription(`${interaction.user} ist **X**. Der Bot ist **O**.\nDu beginnst!`);
+    .setDescription(`${interaction.user} is **X**. The bot is **O**.\nYou go first!`);
 
   await interaction.reply({
     embeds: [embed],
@@ -131,12 +131,12 @@ export async function handleTttMove(interaction, payload) {
   const game = activeTttGames.get(gameId);
 
   if (!game || game.player !== interaction.user.id) {
-    await interaction.reply({ content: '❌ Dieses Spiel gehört dir nicht.', ephemeral: true });
+    await interaction.reply({ content: '❌ This game doesn\'t belong to you.', ephemeral: true });
     return;
   }
 
   if (game.board[index]) {
-    await interaction.reply({ content: '❌ Feld bereits belegt.', ephemeral: true });
+    await interaction.reply({ content: '❌ Field already occupied.', ephemeral: true });
     return;
   }
 
@@ -150,10 +150,10 @@ export async function handleTttMove(interaction, payload) {
   }
 
   let description;
-  if (winner === 'X') description = '🎉 Du gewinnst!';
-  else if (winner === 'O') description = '😢 Der Bot gewinnt!';
-  else if (winner === 'draw') description = '🤝 Unentschieden!';
-  else description = `${interaction.user} ist **X**, Bot ist **O**.`;
+  if (winner === 'X') description = '🎉 You win!';
+  else if (winner === 'O') description = '😢 The bot wins!';
+  else if (winner === 'draw') description = '🤚 Draw!';
+  else description = `${interaction.user} is **X**, bot is **O**.`;
 
   const embed = EmbedBuilder.from(interaction.message.embeds[0]).setDescription(description);
   const finished = Boolean(winner);
@@ -177,14 +177,14 @@ export async function startGuess(interaction) {
 
   const modal = new ModalBuilder()
     .setCustomId(`guess_modal:${gameId}`)
-    .setTitle('Zahl raten (1–100)');
+    .setTitle('Guess a Number (1-100)');
 
   modal.addComponents(
     new ActionRowBuilder().addComponents(
       new TextInputBuilder()
         .setCustomId('guess_number')
-        .setLabel('Deine Zahl')
-        .setPlaceholder('Gib eine Zahl zwischen 1 und 100 ein')
+        .setLabel('Your Number')
+        .setPlaceholder('Enter a number between 1 and 100')
         .setStyle(TextInputStyle.Short)
         .setRequired(true)
         .setMinLength(1)
@@ -201,13 +201,13 @@ export async function handleGuessSubmit(interaction) {
   const game = interaction.client.guessGames.get(gameId);
 
   if (!game) {
-    await interaction.reply({ content: '❌ Spiel abgelaufen. Starte ein neues mit `/minigame zahlen`.', ephemeral: true });
+    await interaction.reply({ content: '❌ Game expired. Start a new one with `/minigame guess`.', ephemeral: true });
     return;
   }
 
   const guess = Number(interaction.fields.getTextInputValue('guess_number'));
   if (!Number.isInteger(guess) || guess < 1 || guess > 100) {
-    await interaction.reply({ content: '❌ Bitte eine gültige Zahl zwischen 1 und 100.', ephemeral: true });
+    await interaction.reply({ content: '❌ Please enter a valid number between 1 and 100.', ephemeral: true });
     return;
   }
 
@@ -216,7 +216,7 @@ export async function handleGuessSubmit(interaction) {
   if (guess === game.secret) {
     interaction.client.guessGames.delete(gameId);
     await interaction.reply({
-      content: `🎉 Richtig! Die Zahl war **${game.secret}**. Du hast ${game.attempts} Versuch(e) gebraucht.`,
+      content: `🎉 Correct! The number was **${game.secret}**. You took ${game.attempts} attempt(s).`,
       ephemeral: true,
     });
     return;
@@ -225,25 +225,25 @@ export async function handleGuessSubmit(interaction) {
   if (game.attempts >= game.maxAttempts) {
     interaction.client.guessGames.delete(gameId);
     await interaction.reply({
-      content: `😢 Game Over! Die Zahl war **${game.secret}**.`,
+      content: `😢 Game Over! The number was **${game.secret}**.`,
       ephemeral: true,
     });
     return;
   }
 
-  const hint = guess < game.secret ? '📈 Höher!' : '📉 Tiefer!';
+  const hint = guess < game.secret ? '📈 Higher!' : '📉 Lower!';
   await interaction.reply({
-    content: `${hint} (${game.maxAttempts - game.attempts} Versuche übrig)`,
+    content: `${hint} (${game.maxAttempts - game.attempts} attempts left)`,
     ephemeral: true,
   });
 }
 
 const TRIVIA = [
-  { q: 'Wie viele Planeten hat unser Sonnensystem (offiziell)?', a: ['8', 'acht'], hint: 'Seit Pluto …' },
-  { q: 'In welchem Jahr wurde Discord gegründet?', a: ['2015'], hint: 'Mitte der 2010er' },
-  { q: 'Was ist die Hauptstadt von Frankreich?', a: ['paris'], hint: 'Stadt der Liebe' },
-  { q: 'Wie viele Bits hat ein Byte?', a: ['8', 'acht'], hint: 'Eine Potenz von 2' },
-  { q: 'Welche Programmiersprache läuft im Browser?', a: ['javascript', 'js'], hint: 'Nicht Java!' },
+  { q: 'How many planets does our solar system have (officially)?', a: ['8', 'eight'], hint: 'Since Pluto ...' },
+  { q: 'In which year was Discord founded?', a: ['2015'], hint: 'Mid 2010s' },
+  { q: 'What is the capital of France?', a: ['paris'], hint: 'City of love' },
+  { q: 'How many bits does a byte have?', a: ['8', 'eight'], hint: 'A power of 2' },
+  { q: 'Which programming language runs in the browser?', a: ['javascript', 'js'], hint: 'Not Java!' },
 ];
 
 export async function startTrivia(interaction) {
@@ -255,8 +255,8 @@ export async function startTrivia(interaction) {
   const embed = new EmbedBuilder()
     .setColor(0x5865f2)
     .setTitle('🧠 Trivia')
-    .setDescription(`**${item.q}**\n\nAntworte mit \`/minigame antworten <text>\`.\n_Tipp:_ ${item.hint}`)
-    .setFooter({ text: '60 Sekunden Zeit' });
+    .setDescription(`**${item.q}**\n\nAnswer with \`/minigame answer <text>\`.\n_Hint:_ ${item.hint}`)
+    .setFooter({ text: '60 seconds' });
 
   await interaction.reply({ embeds: [embed] });
 
@@ -273,7 +273,7 @@ export async function answerTrivia(interaction, answer) {
 
   if (!item) {
     await interaction.reply({
-      content: '❌ Keine aktive Trivia. Starte eine mit `/minigame trivia`.',
+      content: '❌ No active trivia. Start one with `/minigame trivia`.',
       ephemeral: true,
     });
     return;
@@ -282,8 +282,8 @@ export async function answerTrivia(interaction, answer) {
   const normalized = answer.trim().toLowerCase();
   if (item.a.some((a) => a.toLowerCase() === normalized)) {
     interaction.client.triviaGames.delete(interaction.user.id);
-    await interaction.reply({ content: '🎉 Richtig! Gut gemacht!', ephemeral: true });
+    await interaction.reply({ content: '🎉 Correct! Well done!', ephemeral: true });
   } else {
-    await interaction.reply({ content: '❌ Falsch! Versuch es nochmal.', ephemeral: true });
+    await interaction.reply({ content: '❌ Wrong! Try again.', ephemeral: true });
   }
 }

@@ -22,16 +22,20 @@ for (const folder of readdirSync(commandsPath)) {
 const rest = new REST({ version: '10' }).setToken(config.token);
 
 try {
-  if (config.guildId) {
-    await rest.put(Routes.applicationGuildCommands(config.clientId, config.guildId), {
-      body: commands,
-    });
-    console.log(`✅ ${commands.length} Slash-Commands auf Guild ${config.guildId} registriert.`);
+  if (config.guildIds.length > 0) {
+    // Register to multiple guilds if GUILD_ID is provided.
+    for (const guildId of config.guildIds) {
+      await rest.put(Routes.applicationGuildCommands(config.clientId, guildId), {
+        body: commands,
+      });
+      console.log(`✅ ${commands.length} Slash-Commands registered on guild ${guildId}.`);
+    }
   } else {
+    // Register globally when no GUILD_ID is set.
     await rest.put(Routes.applicationCommands(config.clientId), { body: commands });
-    console.log(`✅ ${commands.length} Slash-Commands global registriert (kann bis 1h dauern).`);
+    console.log(`✅ ${commands.length} Slash-Commands registered globally (can take up to 1 hour).`);
   }
 } catch (error) {
-  console.error('Fehler beim Registrieren der Commands:', error);
+  console.error('Error registering commands:', error);
   process.exit(1);
 }

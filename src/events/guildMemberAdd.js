@@ -17,10 +17,10 @@ export default {
 
     const embed = new EmbedBuilder()
       .setColor(0x5865f2)
-      .setTitle(`👋 Willkommen auf ${member.guild.name}!`)
+      .setTitle(`👋 Welcome to ${member.guild.name}!`)
       .setDescription(text)
       .setThumbnail(member.user.displayAvatarURL({ size: 256 }))
-      .setFooter({ text: `Mitglied #${member.guild.memberCount}` })
+      .setFooter({ text: `Member #${member.guild.memberCount}` })
       .setTimestamp();
 
     await channel.send({ embeds: [embed] }).catch(() => {});

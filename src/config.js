@@ -3,21 +3,26 @@ import 'dotenv/config';
 function required(name) {
   const value = process.env[name];
   if (!value) {
-    throw new Error(`Fehlende Umgebungsvariable: ${name}`);
+    throw new Error(`Missing environment variable: ${name}`);
   }
   return value;
 }
 
+// Parse multiple guild IDs (comma-separated) if provided, otherwise leave empty for global registration.
+const guildIdStr = process.env.GUILD_ID || null;
+const guildIds = guildIdStr ? guildIdStr.split(',').map((id) => id.trim()).filter(Boolean) : [];
+
 export const config = {
   token: required('DISCORD_TOKEN'),
   clientId: required('CLIENT_ID'),
-  guildId: process.env.GUILD_ID || null,
+  guildId: null,
+  guildIds: guildIds,
 
   welcome: {
     channelId: process.env.WELCOME_CHANNEL_ID || null,
     message:
       process.env.WELCOME_MESSAGE ||
-      'Willkommen {user} auf **{server}**! Du bist Mitglied #{memberCount}.',
+      'Welcome {user} to **{server}**! You are member #{memberCount}.',
   },
 
   tickets: {

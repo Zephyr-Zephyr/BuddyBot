@@ -18,41 +18,41 @@ import { GIVEAWAY_PREFIX } from '../../utils/constants.js';
 export default {
   data: new SlashCommandBuilder()
     .setName('giveaway')
-    .setDescription('Giveaway-Verwaltung')
+    .setDescription('Giveaway management')
     .addSubcommand((sub) =>
       sub
         .setName('start')
-        .setDescription('Startet ein neues Giveaway')
-        .addStringOption((opt) => opt.setName('preis').setDescription('Was wird verlost?').setRequired(true))
+        .setDescription('Start a new giveaway')
+        .addStringOption((opt) => opt.setName('prize').setDescription('What is being given away?').setRequired(true))
         .addStringOption((opt) =>
-          opt.setName('dauer').setDescription('z.B. 30m, 2h, 1d').setRequired(true)
+          opt.setName('duration').setDescription('e.g., 30m, 2h, 1d').setRequired(true)
         )
         .addIntegerOption((opt) =>
           opt
-            .setName('gewinner')
-            .setDescription('Anzahl der Gewinner (Standard: 1)')
+            .setName('winners')
+            .setDescription('Number of winners (default: 1)')
             .setMinValue(1)
             .setMaxValue(20)
             .setRequired(false)
         )
         .addChannelOption((opt) =>
-          opt.setName('kanal').setDescription('Kanal (Standard: aktueller oder .env)').setRequired(false)
+          opt.setName('channel').setDescription('Channel (default: current or .env)').setRequired(false)
         )
     )
     .addSubcommand((sub) =>
       sub
         .setName('end')
-        .setDescription('Beendet ein Giveaway vorzeitig')
+        .setDescription('End a giveaway early')
         .addStringOption((opt) =>
-          opt.setName('nachricht_id').setDescription('Message-ID des Giveaways').setRequired(true)
+          opt.setName('message_id').setDescription('Message ID of the giveaway').setRequired(true)
         )
     )
     .addSubcommand((sub) =>
       sub
         .setName('reroll')
-        .setDescription('Zieht neue Gewinner für ein beendetes Giveaway')
+        .setDescription('Pick new winners for an ended giveaway')
         .addStringOption((opt) =>
-          opt.setName('nachricht_id').setDescription('Message-ID des Giveaways').setRequired(true)
+          opt.setName('message_id').setDescription('Message ID of the giveaway').setRequired(true)
         )
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
@@ -61,11 +61,11 @@ export default {
     const sub = interaction.options.getSubcommand();
 
     if (sub === 'start') {
-      const prize = interaction.options.getString('preis');
-      const durationStr = interaction.options.getString('dauer');
-      const winnerCount = interaction.options.getInteger('gewinner') || 1;
+      const prize = interaction.options.getString('prize');
+      const durationStr = interaction.options.getString('duration');
+      const winnerCount = interaction.options.getInteger('winners') || 1;
       const channel =
-        interaction.options.getChannel('kanal') ||
+        interaction.options.getChannel('channel') ||
         (config.giveaways.defaultChannelId
           ? interaction.guild.channels.cache.get(config.giveaways.defaultChannelId)
           : null) ||
@@ -74,7 +74,7 @@ export default {
       const ms = parseDuration(durationStr);
       if (!ms || ms < 10_000) {
         await interaction.reply({
-          content: '❌ Ungültige Dauer. Beispiele: `30s`, `15m`, `2h`, `1d` (min. 10 Sekunden).',
+          content: '❌ Invalid duration. Examples: `30s`, `15m`, `2h`, `1d` (minimum: 10 seconds).',
           ephemeral: true,
         });
         return;
@@ -93,7 +93,7 @@ export default {
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
           .setCustomId(`${GIVEAWAY_PREFIX}${id}`)
-          .setLabel('Teilnehmen')
+          .setLabel('Enter')
           .setStyle(ButtonStyle.Success)
           .setEmoji('🎉')
       );
@@ -104,19 +104,19 @@ export default {
         'INSERT INTO giveaways (id, channel_id, message_id, prize, winner_count, ends_at, host_id) VALUES (?, ?, ?, ?, ?, ?, ?)'
       ).run(id, channel.id, message.id, prize, winnerCount, endsAt, interaction.user.id);
 
-      await interaction.reply({ content: `✅ Giveaway in ${channel} gestartet!`, ephemeral: true });
+      await interaction.reply({ content: `✅ Giveaway started in ${channel}!`, ephemeral: true });
       return;
     }
 
     if (sub === 'end' || sub === 'reroll') {
-      const messageId = interaction.options.getString('nachricht_id');
+      const messageId = interaction.options.getString('message_id');
       const giveaway = db
         .prepare('SELECT * FROM giveaways WHERE message_id = ? AND channel_id = ?')
         .get(messageId, interaction.channel.id);
 
       if (!giveaway) {
         await interaction.reply({
-          content: '❌ Kein Giveaway mit dieser Message-ID in diesem Kanal gefunden.',
+          content: '❌ No giveaway with this message ID found in this channel.',
           ephemeral: true,
         });
         return;
@@ -124,15 +124,15 @@ export default {
 
       const winners = await endGiveaway(interaction.client, giveaway.id, sub === 'reroll');
       if (!winners) {
-        await interaction.reply({ content: '❌ Giveaway konnte nicht beendet werden.', ephemeral: true });
+        await interaction.reply({ content: '❌ Could not end giveaway.', ephemeral: true });
         return;
       }
 
       await interaction.reply({
         content:
           sub === 'reroll'
-            ? `🔄 Neue Gewinner: ${winners.map((id) => `<@${id}>`).join(', ') || 'Keine'}`
-            : `✅ Giveaway beendet. Gewinner: ${winners.map((id) => `<@${id}>`).join(', ') || 'Keine'}`,
+            ? `🔄 New winners: ${winners.map((id) => `<@${id}>`).join(', ') || 'None'}`
+            : `✅ Giveaway ended. Winners: ${winners.map((id) => `<@${id}>`).join(', ') || 'None'}`,
         ephemeral: true,
       });
     }

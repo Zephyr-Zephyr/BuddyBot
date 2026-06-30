@@ -19,7 +19,7 @@ export async function createTicket(interaction) {
     const ch = interaction.guild.channels.cache.get(existing.channel_id);
     if (ch) {
       await interaction.reply({
-        content: `ℹ️ Du hast bereits ein offenes Ticket: ${ch}`,
+        content: `ℹ️ You already have an open ticket: ${ch}`,
         ephemeral: true,
       });
       return;
@@ -59,7 +59,7 @@ export async function createTicket(interaction) {
     name: `ticket-${interaction.user.username}`.slice(0, 100).toLowerCase().replace(/[^a-z0-9-]/g, '-'),
     type: ChannelType.GuildText,
     parent: categoryId || undefined,
-    topic: `Ticket von ${interaction.user.tag}`,
+    topic: `Ticket from ${interaction.user.tag}`,
     permissionOverwrites,
   });
 
@@ -69,29 +69,29 @@ export async function createTicket(interaction) {
 
   const embed = new EmbedBuilder()
     .setColor(0x5865f2)
-    .setTitle('🎫 Support-Ticket')
+    .setTitle('🎫 Support Ticket')
     .setDescription(
-      `Hallo ${interaction.user}!\n\nBeschreibe dein Anliegen. Das Team hilft dir so schnell wie möglich.\n\nKlicke **Ticket schließen**, wenn dein Problem gelöst ist.`
+      `Hello ${interaction.user}!\n\nDescribe your issue. The team will help you as soon as possible.\n\nClick **Close Ticket** when your problem is solved.`
     )
     .setTimestamp();
 
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId(TICKET_CLOSE)
-      .setLabel('Ticket schließen')
+      .setLabel('Close Ticket')
       .setStyle(ButtonStyle.Danger)
       .setEmoji('🔒')
   );
 
   await channel.send({ content: `${interaction.user}${supportRoleId ? ` | <@&${supportRoleId}>` : ''}`, embeds: [embed], components: [row] });
-  await interaction.editReply({ content: `✅ Ticket erstellt: ${channel}` });
+  await interaction.editReply({ content: `✅ Ticket created: ${channel}` });
 }
 
 export async function closeTicket(interaction) {
   const ticket = db.prepare('SELECT * FROM tickets WHERE channel_id = ? AND closed = 0').get(interaction.channel.id);
 
   if (!ticket) {
-    await interaction.reply({ content: '❌ Dies ist kein aktives Ticket.', ephemeral: true });
+    await interaction.reply({ content: '❌ This is not an active ticket.', ephemeral: true });
     return;
   }
 
@@ -102,11 +102,11 @@ export async function closeTicket(interaction) {
   const isAdmin = interaction.memberPermissions.has(PermissionFlagsBits.ManageChannels);
 
   if (!isOwner && !isStaff && !isAdmin) {
-    await interaction.reply({ content: '❌ Du darfst dieses Ticket nicht schließen.', ephemeral: true });
+    await interaction.reply({ content: '❌ You are not allowed to close this ticket.', ephemeral: true });
     return;
   }
 
-  await interaction.reply({ content: '🔒 Ticket wird in 5 Sekunden geschlossen...' });
+  await interaction.reply({ content: '🔒 Ticket will be closed in 5 seconds...' });
   db.prepare('UPDATE tickets SET closed = 1 WHERE channel_id = ?').run(interaction.channel.id);
 
   if (config.tickets.logChannelId) {
@@ -116,11 +116,11 @@ export async function closeTicket(interaction) {
         embeds: [
           new EmbedBuilder()
             .setColor(0xed4245)
-            .setTitle('Ticket geschlossen')
+            .setTitle('Ticket Closed')
             .addFields(
-              { name: 'Kanal', value: interaction.channel.name, inline: true },
-              { name: 'Geschlossen von', value: `<@${interaction.user.id}>`, inline: true },
-              { name: 'Ersteller', value: `<@${ticket.user_id}>`, inline: true }
+              { name: 'Channel', value: interaction.channel.name, inline: true },
+              { name: 'Closed by', value: `<@${interaction.user.id}>`, inline: true },
+              { name: 'Creator', value: `<@${ticket.user_id}>`, inline: true }
             )
             .setTimestamp(),
         ],
