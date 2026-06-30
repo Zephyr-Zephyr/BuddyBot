@@ -12,9 +12,9 @@ export default {
       try {
         await command.execute(interaction);
       } catch (error) {
-        console.error(`Fehler bei /${interaction.commandName}:`, error);
+        console.error(`Error while running /${interaction.commandName}:`, error);
         const reply = {
-          content: '❌ Beim Ausführen des Befehls ist ein Fehler aufgetreten.',
+          content: '❌ An error occurred while executing that command.',
           ephemeral: true,
         };
         if (interaction.replied || interaction.deferred) {

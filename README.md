@@ -229,22 +229,22 @@ GIVEAWAY_CHANNEL_ID=123456789012345678
 | `/giveaway start` | Manage Server | Starts a giveaway |
 | `/giveaway end` | Manage Server | Ends a giveaway early |
 | `/giveaway reroll` | Manage Server | Picks new winners |
-| `/umfrage erstellen` | Manage Messages | Creates a poll (2–5 options) |
-| `/umfrage beenden` | Manage Messages | Closes a poll |
+| `/poll create` | Manage Messages | Creates a poll (2–5 options) |
+| `/poll close` | Manage Messages | Closes a poll |
 | `/minigame rps` | Everyone | Rock, Paper, Scissors |
 | `/minigame tictactoe` | Everyone | Tic-Tac-Toe vs bot |
-| `/minigame zahlen` | Everyone | Guess a number between 1–100 |
+| `/minigame guess` | Everyone | Guess a number between 1–100 |
 | `/minigame trivia` | Everyone | Start a quiz question |
-| `/minigame antworten` | Everyone | Submit a trivia answer |
+| `/minigame answer` | Everyone | Submit a trivia answer |
 
-> **Note:** Poll and minigame subcommands use German names (`erstellen`, `beenden`, `zahlen`, `antworten`) in the code. You can rename them in `src/commands/` if you prefer English command names.
+> **Note:** The bot now uses English command names and subcommands by default.
 
 **Giveaway duration format:** `30s`, `15m`, `2h`, `1d` (minimum: 10 seconds)
 
 **Example:**
 
 ```
-/giveaway start preis:Nitro dauer:1d gewinner:2
+/giveaway start prize:Nitro duration:1d winners:2
 ```
 
 ---

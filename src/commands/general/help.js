@@ -3,42 +3,42 @@ import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 export default {
   data: new SlashCommandBuilder()
     .setName('help')
-    .setDescription('Zeigt alle Bot-Befehle an'),
+    .setDescription('Shows all bot commands'),
 
   async execute(interaction) {
     const embed = new EmbedBuilder()
       .setColor(0x5865f2)
       .setTitle('📖 Discord Community Bot')
-      .setDescription('Welcome · Tickets · Giveaways · Umfragen · Minigames')
+      .setDescription('Welcome · Tickets · Giveaways · Polls · Minigames')
       .addFields(
         {
           name: '🎫 Tickets',
-          value: '`/ticket panel` – Ticket-Panel erstellen\nButton **Ticket erstellen** öffnet einen privaten Kanal',
+          value: '`/ticket panel` – Create the ticket panel\nButton **Create Ticket** opens a private channel',
         },
         {
           name: '🎁 Giveaways',
           value:
-            '`/giveaway start` – Giveaway starten\n`/giveaway end` – Vorzeitig beenden\n`/giveaway reroll` – Neue Gewinner ziehen',
+            '`/giveaway start` – Start a giveaway\n`/giveaway end` – End early\n`/giveaway reroll` – Pick new winners',
         },
         {
-          name: '📊 Umfragen',
-          value: '`/umfrage erstellen` – Umfrage mit bis zu 5 Optionen\n`/umfrage beenden` – Umfrage schließen',
+          name: '📊 Polls',
+          value: '`/poll create` – Create a poll with up to 5 options\n`/poll close` – Close a poll',
         },
         {
           name: '🎮 Minigames',
           value:
-            '`/minigame rps` – Schere, Stein, Papier\n`/minigame tictactoe` – Tic-Tac-Toe vs Bot\n`/minigame zahlen` – Zahl raten (1–100)\n`/minigame trivia` + `/minigame antworten` – Quiz',
+            '`/minigame rps` – Rock, Paper, Scissors\n`/minigame tictactoe` – Tic-Tac-Toe vs bot\n`/minigame guess` – Guess a number (1–100)\n`/minigame trivia` + `/minigame answer` – Trivia quiz',
         },
         {
-          name: '� Status',
-          value: '`/status` – Prüft den aktuellen Status der Pulse-Webseite und zeigt den Entwicklungsstatus an',
+          name: '📡 Status',
+          value: '`/status` – Check the current status of the Pulse website',
         },
         {
-          name: '�👋 Welcome',
-          value: 'Automatische Begrüßung bei neuen Mitgliedern (Kanal in `.env` konfigurieren)',
+          name: '👋 Welcome',
+          value: 'Automatic greeting for new members (configure the channel in `.env`)',
         }
       )
-      .setFooter({ text: 'Setup: siehe README.md' });
+      .setFooter({ text: 'Setup: see README.md' });
 
     await interaction.reply({ embeds: [embed], ephemeral: true });
   },
